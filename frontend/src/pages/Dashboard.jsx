@@ -8,6 +8,7 @@ const TABS = [
   { id: 'server', label: 'Server Control' },
   { id: 'mods', label: 'Mod Manager' },
   { id: 'console', label: 'Console' },
+  { id: 'about', label: 'About' },
 ]
 
 export default function Dashboard() {
@@ -44,6 +45,31 @@ export default function Dashboard() {
         </div>
         <div style={{ display: activeTab === 'console' ? 'block' : 'none' }}>
           <ConsolePanel />
+        </div>
+        <div style={{ display: activeTab === 'about' ? 'block' : 'none' }}>
+          <div className="card">
+            <div className="card-header">
+              <h2>About</h2>
+            </div>
+            <div className="card-body">
+              <p style={{ marginTop: 0 }}>
+                mcwebadmin — lightweight web-based Minecraft server administration.
+              </p>
+              <ul style={{ paddingLeft: 18 }}>
+                <li><strong>Version:</strong> v1.0.0 (2026-05-25)</li>
+                <li>
+                  <strong>Developer:</strong> Scott McGrath — 
+                  <a href="mailto:scott@smcgrath.com">scott@smcgrath.com</a>
+                </li>
+                <li>
+                  <strong>Source:</strong>{' '}
+                  <a href="https://github.com/HighTechHarmony/mcwebadmin" target="_blank" rel="noreferrer">
+                    https://github.com/HighTechHarmony/mcwebadmin
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </main>
     </div>

@@ -22,10 +22,10 @@ export default function StatusCard() {
     }
   }, [])
 
-  // Poll every 5 s
+  // Poll every 10 s
   useEffect(() => {
     fetchStatus()
-    const id = setInterval(fetchStatus, 5000)
+    const id = setInterval(fetchStatus, 10000)
     return () => clearInterval(id)
   }, [fetchStatus])
 
