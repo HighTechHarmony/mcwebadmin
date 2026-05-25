@@ -21,22 +21,35 @@ export default function LogViewer() {
 
     socket.on('connect', () => setConnected(true))
     socket.on('disconnect', () => setConnected(false))
+
+    // When a new line arrives, decide whether to auto-scroll based on the
+    // current scroll position _before_ appending the line. This prevents the
+    // viewer from jumping to the bottom when the user has scrolled up.
     socket.on('log_line', ({ data }) => {
+      const el = containerRef.current
+      const isAtBottom = el ? el.scrollHeight - el.scrollTop - el.clientHeight < 40 : true
+
       setLines((prev) => {
         const next = [...prev, data]
         return next.length > MAX_LINES ? next.slice(next.length - MAX_LINES) : next
       })
+
+      if (isAtBottom) {
+        // Wait for the DOM update, then scroll into view
+        requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'auto' }))
+        autoScroll.current = true
+      } else {
+        // preserve user's scroll position; mark autoScroll disabled
+        autoScroll.current = false
+      }
     })
 
     return () => socket.disconnect()
   }, [])
 
-  // Auto-scroll when new lines arrive
-  useEffect(() => {
-    if (autoScroll.current) {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' })
-    }
-  }, [lines])
+  // NOTE: Auto-scrolling is handled in the socket handler so we only scroll
+  // when the user was already at (or very near) the bottom prior to the
+  // incoming line. This avoids disruptive jumps while reading history.
 
   // Pause auto-scroll when user scrolls up; resume at bottom
   const handleScroll = () => {

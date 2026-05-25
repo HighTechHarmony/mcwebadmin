@@ -16,8 +16,8 @@ export default function Dashboard() {
       </header>
       <main className="app-main">
         <StatusCard />
-        <ConsolePanel />
         <ModManager />
+        <ConsolePanel />
       </main>
     </div>
   )
