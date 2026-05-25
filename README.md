@@ -1,5 +1,7 @@
 # mcwebadmin
 
+![mcwebadmin screenshot](assets/mcwebadmin-screenshot.png)
+
 A lightweight, single-page web management tool for self-hosted modded Minecraft (Fabric) servers running on Ubuntu 22.04.
 
 ## 🚀 Overview
@@ -124,3 +126,31 @@ To run in development mode (with hot-reloading):
 ## 📄 License
 
 MIT
+
+## Permissions & Ownership
+
+To run `mcwebadmin` as the dedicated `mcwebadmin` system user and allow it to manage the server and static files, the following ownership and permission changes were made or recommended. Run these commands as a privileged user (using `sudo`) to reproduce the environment that worked here:
+
+- Ensure the control/home directory for the service exists and is owned by the `mcwebadmin` user:
+
+```bash
+sudo mkdir -p /home/mcwebadmin
+sudo chown mcwebadmin:mcwebadmin /home/mcwebadmin
+sudo chmod 750 /home/mcwebadmin
+```
+
+- Make the application directory owned by the `mcwebadmin` user (recursively):
+
+```bash
+sudo chown -R mcwebadmin:mcwebadmin /home/minecraft/mcwebadmin
+sudo chmod -R 750 /home/minecraft/mcwebadmin
+```
+
+- Make sure the Minecraft server and mods directories are accessible to the web admin user. Depending on your deployment and security model you can either grant group access or give `mcwebadmin` ownership of specific subpaths used for mod management:
+
+```bash
+# Example: allow mcwebadmin to manage mod files
+sudo chown -R mcwebadmin:mcwebadmin /opt/fabric/mods
+sudo chown -R mcwebadmin:mcwebadmin /opt/fabric/mod_stash
+sudo chmod -R 750 /opt/fabric/mods /opt/fabric/mod_stash
+```
