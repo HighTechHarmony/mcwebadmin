@@ -1,4 +1,5 @@
 import os
+import logging
 
 from datetime import timedelta
 from flask import Flask, jsonify, request, send_from_directory
@@ -7,11 +8,20 @@ from flask_socketio import SocketIO
 
 socketio = SocketIO()
 
+# Configure logging at the module level
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+)
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+
+    # Ensure Flask's logger level is also set
+    app.logger.setLevel(logging.INFO)
 
     jwt = JWTManager(app)
 
