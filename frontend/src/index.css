@@ -590,4 +590,140 @@ body {
   }
 
   .mod-pane { max-height: none; }
+
+  .tab-bar { flex-wrap: wrap; }
+  .shortcuts-bar { flex-wrap: wrap; }
+}
+
+/* ================================================================
+   Top-level tab bar
+   ================================================================ */
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.tab-btn {
+  padding: 7px 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.tab-btn:hover {
+  background: var(--bg-card);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.tab-btn.active {
+  background: var(--bg-card);
+  color: var(--accent);
+  border-color: var(--border);
+}
+
+/* ================================================================
+   Console sub-tabs
+   ================================================================ */
+
+.sub-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.sub-tab-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+  margin-bottom: -1px;
+}
+
+.sub-tab-btn:hover { color: var(--text); }
+
+.sub-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ================================================================
+   Command shortcuts bar
+   ================================================================ */
+
+.shortcuts-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.shortcuts-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-right: 2px;
+}
+
+.shortcut-btn {
+  padding: 3px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.shortcut-btn:hover {
+  background: var(--bg-card);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ================================================================
+   Command output panel
+   ================================================================ */
+
+.output-panel {
+  background: #010409;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  height: 440px;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.output-pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #cdd9e5;
+  margin: 0;
+}
+
+.output-pre.error { color: var(--danger); }
+
+.output-empty {
+  color: var(--text-dim);
+  text-align: center;
+  padding: 60px 0;
+  font-size: 13px;
 }
