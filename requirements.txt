@@ -1,0 +1,9 @@
+flask>=3.0
+flask-socketio>=5.3
+flask-jwt-extended>=4.6
+gevent>=24.0
+gevent-websocket>=0.10
+gunicorn>=21.0
+python-dotenv>=1.0
+mcrcon>=0.7
+werkzeug>=3.0
