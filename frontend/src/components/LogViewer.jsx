@@ -23,7 +23,11 @@ export default function LogViewer({ forceFetchToken = null }) {
         if (!mounted) return
         if (Array.isArray(res.data.lines)) {
           setLines(res.data.lines)
-          requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'auto' }))
+          // Ensure initial load scrolls to bottom and enables auto-scroll
+          requestAnimationFrame(() => {
+            bottomRef.current?.scrollIntoView({ behavior: 'auto' })
+            autoScroll.current = true
+          })
         }
       } catch (err) {
         // ignore — live stream will still provide new lines
@@ -50,16 +54,17 @@ export default function LogViewer({ forceFetchToken = null }) {
       const el = containerRef.current
       const isAtBottom = el ? el.scrollHeight - el.scrollTop - el.clientHeight < 40 : true
 
+      // Update autoScroll state based on current position (before appending)
+      autoScroll.current = isAtBottom
+
       setLines((prev) => {
         const next = [...prev, data]
         return next.length > MAX_LINES ? next.slice(next.length - MAX_LINES) : next
       })
 
-      if (isAtBottom) {
+      // If auto-scroll enabled, scroll to bottom after DOM update
+      if (autoScroll.current) {
         requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'auto' }))
-        autoScroll.current = true
-      } else {
-        autoScroll.current = false
       }
     })
 
