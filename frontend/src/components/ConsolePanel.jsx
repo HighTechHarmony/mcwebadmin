@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Convert from 'ansi-to-html'
 import LogViewer from './LogViewer'
 import CommandInput from './CommandInput'
@@ -7,11 +7,19 @@ const converter = new Convert({ escapeXML: true })
 
 const COMMAND_SHORTCUTS = ['help', 'list', 'op']
 
-export default function ConsolePanel() {
+export default function ConsolePanel({ forceSubTab = null }) {
   const [activeSubTab, setActiveSubTab] = useState('console')
   const [command, setCommand] = useState('')
   const [lastResponse, setLastResponse] = useState(null)
   const inputRef = useRef(null)
+
+  // allow parent to force the active sub-tab (e.g. focus console)
+  // `forceSubTab` is expected as { tab: 'console'|'output', token: number }
+  useEffect(() => {
+    if (forceSubTab && forceSubTab.token) {
+      setActiveSubTab(forceSubTab.tab)
+    }
+  }, [forceSubTab && forceSubTab.token])
 
   const handleShortcut = (cmd) => {
     setCommand(cmd + ' ')

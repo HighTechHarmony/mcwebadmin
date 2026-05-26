@@ -14,6 +14,13 @@ const TABS = [
 export default function Dashboard() {
   const { logout } = useAuth()
   const [activeTab, setActiveTab] = useState('server')
+  // small token-based signal to force ConsolePanel's sub-tab even if same value
+  const [consoleFocusToken, setConsoleFocusToken] = useState(0)
+
+  const focusConsole = () => {
+    setActiveTab('console')
+    setConsoleFocusToken((t) => t + 1)
+  }
 
   return (
     <div className="app-layout">
@@ -38,13 +45,13 @@ export default function Dashboard() {
 
         {/* All panels stay mounted to preserve WebSocket + polling */}
         <div style={{ display: activeTab === 'server' ? 'block' : 'none' }}>
-          <StatusCard />
+          <StatusCard focusConsole={focusConsole} />
         </div>
         <div style={{ display: activeTab === 'mods' ? 'block' : 'none' }}>
           <ModManager />
         </div>
         <div style={{ display: activeTab === 'console' ? 'block' : 'none' }}>
-          <ConsolePanel />
+          <ConsolePanel forceSubTab={{ tab: 'console', token: consoleFocusToken }} />
         </div>
         <div style={{ display: activeTab === 'about' ? 'block' : 'none' }}>
           <div className="card">

@@ -9,7 +9,7 @@ const STATUS_META = {
   failed:       { label: 'Failed',     cls: 'status-failed' },
 }
 
-export default function StatusCard() {
+export default function StatusCard({ focusConsole }) {
   const [status, setStatus] = useState('unknown')
   const [pendingAction, setPendingAction] = useState('')
 
@@ -55,21 +55,21 @@ export default function StatusCard() {
       <div className="card-body btn-group">
         <button
           className="btn btn-success"
-          onClick={() => handleAction('start')}
+          onClick={() => { focusConsole?.(); handleAction('start') }}
           disabled={busy || status === 'active'}
         >
           {pendingAction === 'start' ? '…' : '▶ Start'}
         </button>
         <button
           className="btn btn-danger"
-          onClick={() => handleAction('stop')}
+          onClick={() => { focusConsole?.(); handleAction('stop') }}
           disabled={busy || status === 'inactive'}
         >
           {pendingAction === 'stop' ? '…' : '■ Stop'}
         </button>
         <button
           className="btn btn-warning"
-          onClick={() => handleAction('restart')}
+          onClick={() => { focusConsole?.(); handleAction('restart') }}
           disabled={busy}
         >
           {pendingAction === 'restart' ? '…' : '↺ Restart'}
