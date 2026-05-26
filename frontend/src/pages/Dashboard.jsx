@@ -65,7 +65,7 @@ export default function Dashboard() {
               <ul style={{ paddingLeft: 18 }}>
                 <li><strong>Version:</strong> v1.0.0 (2026-05-25)</li>
                 <li>
-                  <strong>Developer:</strong> Scott McGrath — 
+                  <strong>Developer:</strong> Scott McGrath —
                   <a href="mailto:scott@smcgrath.com">scott@smcgrath.com</a>
                 </li>
                 <li>

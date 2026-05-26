@@ -1,19 +1,43 @@
 import { useState, useEffect, useRef } from 'react'
 import { io } from 'socket.io-client'
 import Convert from 'ansi-to-html'
+import api from '../api'
 
 const converter = new Convert({ escapeXML: true })
 
 const MAX_LINES = 1000
 
-export default function LogViewer() {
+export default function LogViewer({ forceFetchToken = null }) {
   const [lines, setLines] = useState([])
   const [connected, setConnected] = useState(false)
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const autoScroll = useRef(true)
+  // Fetch history when mounted or when parent signals focus via token
+  useEffect(() => {
+    let mounted = true
 
-  // Socket.IO connection
+    const fetchHistory = async () => {
+      try {
+        const res = await api.get(`/console/log?lines=${MAX_LINES}`)
+        if (!mounted) return
+        if (Array.isArray(res.data.lines)) {
+          setLines(res.data.lines)
+          requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'auto' }))
+        }
+      } catch (err) {
+        // ignore — live stream will still provide new lines
+      }
+    }
+
+    fetchHistory()
+
+    return () => {
+      mounted = false
+    }
+  }, [forceFetchToken && forceFetchToken.token])
+
+  // Socket.IO connection (single mount)
   useEffect(() => {
     const socket = io('/console', {
       auth: { token: localStorage.getItem('token') },
@@ -22,9 +46,6 @@ export default function LogViewer() {
     socket.on('connect', () => setConnected(true))
     socket.on('disconnect', () => setConnected(false))
 
-    // When a new line arrives, decide whether to auto-scroll based on the
-    // current scroll position _before_ appending the line. This prevents the
-    // viewer from jumping to the bottom when the user has scrolled up.
     socket.on('log_line', ({ data }) => {
       const el = containerRef.current
       const isAtBottom = el ? el.scrollHeight - el.scrollTop - el.clientHeight < 40 : true
@@ -35,11 +56,9 @@ export default function LogViewer() {
       })
 
       if (isAtBottom) {
-        // Wait for the DOM update, then scroll into view
         requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'auto' }))
         autoScroll.current = true
       } else {
-        // preserve user's scroll position; mark autoScroll disabled
         autoScroll.current = false
       }
     })

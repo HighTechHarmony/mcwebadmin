@@ -3,6 +3,7 @@ import sys
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
 from mcrcon import MCRcon
+import os
 
 console_bp = Blueprint("console", __name__, url_prefix="/api/console")
 
@@ -69,3 +70,66 @@ def send_command():
         return jsonify({"error": "RCON unavailable — is the server running?"}), 502
     except Exception as exc:
         return jsonify({"error": f"RCON error: {exc}"}), 502
+
+
+def _tail_lines(path: str, max_lines: int = 1000):
+    """Return the last `max_lines` lines from the file at `path`.
+    This reads from the end of the file in blocks to avoid loading the
+    entire file into memory.
+    """
+    if max_lines <= 0:
+        return []
+
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(0, os.SEEK_END)
+            filesize = fh.tell()
+            if filesize == 0:
+                return []
+
+            block_size = 8192
+            data = bytearray()
+            pos = filesize
+
+            # Read backwards in blocks until we have enough newlines
+            while pos > 0 and data.count(b"\n") <= max_lines:
+                read_size = min(block_size, pos)
+                pos -= read_size
+                fh.seek(pos)
+                chunk = fh.read(read_size)
+                data[0:0] = chunk  # prepend
+
+                # If we've reached start of file, stop
+                if pos == 0:
+                    break
+
+            # Split into lines and return the last `max_lines`
+            lines = data.splitlines()
+            return [ln.decode("utf-8", errors="replace") for ln in lines[-max_lines:]]
+    except FileNotFoundError:
+        return []
+    except Exception:
+        logging.exception("Failed to read log file")
+        return []
+
+
+@console_bp.route("/log", methods=["GET"])
+@jwt_required()
+def get_log():
+    """Return the last N lines from the configured log file as JSON.
+
+    Query param: `lines` (optional, default 1000, max 5000)
+    """
+    try:
+        max_lines = int(request.args.get("lines", 1000))
+    except Exception:
+        max_lines = 1000
+
+    max_lines = max(1, min(max_lines, 5000))
+    log_path = current_app.config.get("LOG_PATH", "/opt/fabric/logs/latest.log")
+
+    if not os.path.exists(log_path):
+        return jsonify({"lines": []})
+
+    lines = _tail_lines(log_path, max_lines)
+    return jsonify({"lines": lines})

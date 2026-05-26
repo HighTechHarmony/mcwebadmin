@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '../api'
 
 const STATUS_META = {
-  active:       { label: 'Online',     cls: 'status-active' },
-  activating:   { label: 'Starting…',  cls: 'status-activating' },
-  deactivating: { label: 'Stopping…',  cls: 'status-activating' },
-  inactive:     { label: 'Offline',    cls: 'status-inactive' },
-  failed:       { label: 'Failed',     cls: 'status-failed' },
+  active: { label: 'Online', cls: 'status-active' },
+  activating: { label: 'Starting…', cls: 'status-activating' },
+  deactivating: { label: 'Stopping…', cls: 'status-activating' },
+  inactive: { label: 'Offline', cls: 'status-inactive' },
+  failed: { label: 'Failed', cls: 'status-failed' },
 }
 
 export default function StatusCard({ focusConsole }) {

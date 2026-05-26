@@ -50,7 +50,7 @@ export default function ConsolePanel({ forceSubTab = null }) {
 
       {/* LogViewer stays mounted to preserve the WebSocket connection */}
       <div style={{ display: activeSubTab === 'console' ? 'block' : 'none' }}>
-        <LogViewer />
+        <LogViewer forceFetchToken={forceSubTab} />
       </div>
 
       <div
