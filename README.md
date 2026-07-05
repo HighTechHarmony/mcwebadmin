@@ -18,6 +18,11 @@ A lightweight, single-page web management tool for self-hosted modded Minecraft 
     -   Manage an "Available/Stashed" directory for inactive mods.
     -   Atomically move mods between active and inactive states.
     -   Direct `.jar` upload to the stash directory.
+-   **World Manager:**
+    -   View active/inactive world status, size, and top-level contents.
+    -   Swap active and inactive worlds atomically (requires server stopped).
+    -   Download either world as a ZIP archive.
+    -   Upload a world ZIP into the inactive slot with overwrite confirmation.
 -   **Secure by Design:** 
     -   Runs as a dedicated `mcwebadmin` system user.
     -   Path traversal protection on all file operations.
@@ -123,6 +128,42 @@ To run in development mode (with hot-reloading):
 -   **Authentication:** Access is protected by a single admin password (hashed via Werkzeug). 
 -   **Port:** By default, the app listens on `0.0.0.0:8080`. It is recommended to use a reverse proxy (like Nginx) or a firewall to restrict access to trusted IPs.
 
+## 🌍 World Manager Behavior
+
+The World Manager is designed around two directories:
+
+-   **Active world:** `/opt/fabric/world`
+-   **Inactive world:** `/opt/fabric/world.inactive`
+
+### Status and Contents
+
+-   The UI shows whether each world directory exists, total size, and top-level entries.
+-   Disk usage is also shown so you can estimate free space before uploads/downloads.
+
+### Swap Worlds
+
+-   Swap performs an atomic 3-step rename using a temporary directory (`world_swap_tmp`) under `/opt/fabric`.
+-   The server must be stopped before swapping.
+-   If neither world directory exists, swap is rejected.
+
+### Download ZIP
+
+-   Download creates a ZIP in `/tmp` and streams it to the browser.
+-   Before each new download, previous `mcwebadmin` world temp directories in `/tmp` are removed.
+
+### Upload ZIP (Inactive Slot)
+
+-   Upload always targets the **inactive** slot.
+-   If the inactive slot already contains data, the UI prompts for confirmation before replacing it.
+-   ZIP processing flow:
+    1.  Extract ZIP to a temporary staging directory in `/tmp`.
+    2.  Search extracted content for a world root by locating `level.dat`.
+    3.  If no valid root is found (or ambiguous roots are found), upload is rejected.
+    4.  Clear existing contents of `/opt/fabric/world.inactive` (no merge).
+    5.  Move the detected world root contents into `/opt/fabric/world.inactive` as top-level files/folders.
+
+This handles ZIPs that contain an outer folder (for example `MyWorld/level.dat`) as well as flat world ZIPs.
+
 ## 📄 License
 
 MIT
@@ -147,10 +188,25 @@ sudo chmod -R 750 /home/minecraft/mcwebadmin
 ```
 
 - Make sure the Minecraft server and mods directories are accessible to the web admin user. Depending on your deployment and security model you can either grant group access or give `mcwebadmin` ownership of specific subpaths used for mod management:
+- Make sure the Minecraft server and world/mod directories are accessible to the web admin user. The world swap operation requires write access to the parent directory (`/opt/fabric`) because it creates a temporary rename target there.
+
+```bash
+# Parent directory must be group-writable for world swap temp rename
+sudo chmod 2775 /opt/fabric
+
+# World directories should be writable by the shared group
+sudo chmod 2775 /opt/fabric/world /opt/fabric/world.inactive
+```
+
+- Depending on your deployment and security model, either grant group access or give `mcwebadmin` ownership of specific subpaths used for mod/world management:
 
 ```bash
 # Example: allow mcwebadmin to manage mod files
 sudo chown -R mcwebadmin:mcwebadmin /opt/fabric/mods
 sudo chown -R mcwebadmin:mcwebadmin /opt/fabric/mod_stash
 sudo chmod -R 750 /opt/fabric/mods /opt/fabric/mod_stash
+
+# Example: shared-group model for worlds (owner can remain minecraft)
+sudo chown -R minecraft:minecraft /opt/fabric/world /opt/fabric/world.inactive
+sudo chmod -R g+rwX /opt/fabric/world /opt/fabric/world.inactive
 ```

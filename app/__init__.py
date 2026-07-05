@@ -58,11 +58,13 @@ def create_app():
     from .server import server_bp
     from .console import console_bp
     from .mods import mods_bp
+    from .worlds import worlds_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(server_bp)
     app.register_blueprint(console_bp)
     app.register_blueprint(mods_bp)
+    app.register_blueprint(worlds_bp)
 
     # ------------------------------------------------------------------ #
     # Socket.IO event registration + log-tail background thread           #

@@ -13,6 +13,7 @@ EnvironmentFile=/home/minecraft/mcwebadmin/.env
 ExecStart=/home/minecraft/mcwebadmin/.venv/bin/gunicorn \
     --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker \
     --workers 1 \
+    --timeout 300 \
     --bind 0.0.0.0:8080 \
     --access-logfile - \
     --error-logfile - \

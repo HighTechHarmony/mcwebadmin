@@ -18,6 +18,8 @@ class Config:
     MODS_DIR = os.getenv("MODS_DIR", "/opt/fabric/mods")
     MOD_STASH_DIR = os.getenv("MOD_STASH_DIR", "/opt/fabric/mod_stash")
     LOG_PATH = os.getenv("LOG_PATH", "/opt/fabric/logs/latest.log")
+    WORLD_ACTIVE_DIR = os.getenv("WORLD_ACTIVE_DIR", "/opt/fabric/world")
+    WORLD_INACTIVE_DIR = os.getenv("WORLD_INACTIVE_DIR", "/opt/fabric/world.inactive")
 
     # --- Service ---
     SERVICE_NAME = os.getenv("SERVICE_NAME", "minecraft-fabric.service")

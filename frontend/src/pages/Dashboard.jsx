@@ -3,10 +3,12 @@ import { useAuth } from '../context/AuthContext'
 import StatusCard from '../components/StatusCard'
 import ConsolePanel from '../components/ConsolePanel'
 import ModManager from '../components/ModManager'
+import WorldManager from '../components/WorldManager'
 
 const TABS = [
   { id: 'server', label: 'Server Control' },
   { id: 'mods', label: 'Mod Manager' },
+  { id: 'worlds', label: 'World Manager' },
   { id: 'console', label: 'Console' },
   { id: 'about', label: 'About' },
 ]
@@ -49,6 +51,9 @@ export default function Dashboard() {
         </div>
         <div style={{ display: activeTab === 'mods' ? 'block' : 'none' }}>
           <ModManager />
+        </div>
+        <div style={{ display: activeTab === 'worlds' ? 'block' : 'none' }}>
+          <WorldManager />
         </div>
         <div style={{ display: activeTab === 'console' ? 'block' : 'none' }}>
           <ConsolePanel forceSubTab={{ tab: 'console', token: consoleFocusToken }} />
